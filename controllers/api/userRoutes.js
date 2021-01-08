@@ -1,52 +1,49 @@
-const router = require("express").Router();
-// const { User } = require("../../models");
+const router = require('express').Router();
+const { User } = require('../../models');
 
-// Create new user
-router.post("/", async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
-    console.log(req.body)
-    const userData = await User.create(req.body);
-    req.session.save(() => {
-      req.session.logged_in = true;
-      req.session.user_id = userData.id;
-      res.status(200).json(userData);
-    });
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
+    // Find the user who matches the posted e-mail address
+    const userData = await User.findOne({ where: { email: req.body.email } });
 
-// Login
-router.post("/session", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ where: { email } });
-    if (user && (await user.checkPassword(password))) {
-      req.session.save(() => {
-        req.session.logged_in = true;
-        req.session.user_id = user.id;
-        res.status(200).json(user);
-      });
+    if (!userData) {
+      res
+        .status(400)
+        .json({ message: 'Incorrect email or password, please try again' });
       return;
     }
-    res.status(401).send("Invalid login credentials!");
+
+    // Verify the posted password with the password store in the database
+    const validPassword = await userData.checkPassword(req.body.password);
+
+    if (!validPassword) {
+      res
+        .status(400)
+        .json({ message: 'Incorrect email or password, please try again' });
+      return;
+    }
+
+    // Create session variables based on the logged in user
+    req.session.save(() => {
+      req.session.user_id = userData.id;
+      req.session.logged_in = true;
+      
+      res.json({ user: userData, message: 'You are now logged in!' });
+    });
+
   } catch (err) {
-    res.status(500).json(err);
+    res.status(400).json(err);
   }
 });
 
-// Logout
-router.delete("/session", async (req, res) => {
-  try {
-    if (req.session.logged_in) {
-      req.session.destroy(() => {
-        res.status(204).end();
-      });
-    } else {
-      res.status.end();
-    }
-  } catch (err) {
-    res.status(500).json(err);
+router.post('/logout', (req, res) => {
+  if (req.session.logged_in) {
+    // Remove the session variables
+    req.session.destroy(() => {
+      res.status(204).end();
+    });
+  } else {
+    res.status(404).end();
   }
 });
 
