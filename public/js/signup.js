@@ -2,14 +2,14 @@ const signupbtn = document.querySelector('#signupbtn');
 // Send request to API to sign user up
 signupbtn.addEventListener('click', async (e) => {
   e.preventDefault();
-  const displayName = document.querySelector('#name').value.trim();
+  const display_name = document.querySelector('#name').value.trim();
   const email = document.querySelector('#signup-email').value.trim();
   const password = document.querySelector('#signup-pw').value.trim();
 
   const response = await fetch('/api/users/', {
     method: 'POST',
     body: JSON.stringify({
-      displayName,
+      displayName: display_name,
       email,
       password,
     }),
