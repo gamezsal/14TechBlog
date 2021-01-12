@@ -2,7 +2,7 @@ const signupbtn = document.querySelector('#signupbtn');
 // Send request to API to sign user up
 signupbtn.addEventListener('click', async (e) => {
   e.preventDefault();
-  const displayName = document.querySelector('#display-name').value.trim();
+  const displayName = document.querySelector('#name').value.trim();
   const email = document.querySelector('#signup-email').value.trim();
   const password = document.querySelector('#signup-pw').value.trim();
 
