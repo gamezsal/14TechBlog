@@ -17,7 +17,7 @@ signupbtn.addEventListener('click', async (e) => {
   });
 
   if (response.ok) {
-    document.location.replace('/');
+    document.location.replace('/profile');
   } else {
     document.querySelector('#signup-error').textContent =
       'Failed to sign up. Try again.';
